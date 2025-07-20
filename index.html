@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background:white;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .container {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        width: 100%;
+        max-width: 800px;
+      }
+
+      h2 {
+        text-align: center;
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+      }
+
+      form {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      label {
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+        color: #374151;
+        display: block;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+        outline: none;
+        transition: 0.2s;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #a78bfa;
+        box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3);
+      }
+
+      button {
+        background: #9333ea;
+        color: white;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.7rem;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+      }
+
+      button:hover {
+        background: #7e22ce;
+      }
+
+      #msg {
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-top: 0.5rem;
+        color: #16a34a;
+      }
+
+      .error {
+        color: #dc2626;
+      }
+
+      @media (min-width: 768px) {
+        form {
+          grid-template-columns: 1fr 1fr;
+          gap: 1.25rem;
+        }
+
+        .full {
+          grid-column: span 2;
+        }
+      }
+
+      @media (max-width: 767px) {
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+
+        h2 {
+          font-size: 1.4rem;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Create Your Account</h2>
+      <form id="registerForm">
+        <div>
+          <label for="name">Full Name</label>
+          <input type="text" name="name" id="name" required />
+        </div>
+
+        <div>
+          <label for="email">Email</label>
+          <input type="email" name="email" id="email" required />
+        </div>
+
+        <div>
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" required />
+        </div>
+
+        <div>
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            id="confirmPassword"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="phone">Phone</label>
+          <input type="tel" name="phone" id="phone" />
+        </div>
+
+        <div>
+          <label for="college">College Name</label>
+          <input type="text" name="college" id="college" />
+        </div>
+
+        <div class="full">
+          <label for="address">Address</label>
+          <input type="text" name="address" id="address" />
+        </div>
+
+        <div>
+          <label for="gender">Gender</label>
+          <select name="gender" id="gender">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="bio">Bio</label>
+          <textarea name="bio" id="bio" rows="2"></textarea>
+        </div>
+
+        <div class="full">
+          <button type="submit">Register</button>
+          <p id="msg"></p>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const data = {
+            name: form.name.value,
+            email: form.email.value,
+            password: form.password.value,
+            confirmPassword: form.confirmPassword.value,
+            phone: form.phone.value,
+            address: form.address.value,
+            college: form.college.value,
+            gender: form.gender.value,
+            bio: form.bio.value,
+          };
+
+          const msg = document.getElementById("msg");
+
+          if (data.password !== data.confirmPassword) {
+            msg.textContent = "Passwords do not match.";
+            msg.className = "error";
+            return;
+          }
+
+          try {
+            const res = await fetch("/submit", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            });
+            const result = await res.json();
+            msg.textContent = result.message || "Form submitted!";
+            msg.className = "";
+          } catch (err) {
+            msg.textContent = "Error submitting form.";
+            msg.className = "error";
+          }
+        });
+    </script>
+  </body>
+</html>
